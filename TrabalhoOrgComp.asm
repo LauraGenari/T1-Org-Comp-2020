@@ -1,11 +1,9 @@
-							#Alunos:
-    							# Mariela Hennies Lauand NUSP 10819012
-    							# João Pedro Uchôa Cavalcante NUSP 10801169
-    							# Bruno Germano do Nascimento NUSP 10893131
-    							# Leonardo Chippe NUSP 9368730
 	
 	.data
-	opcoesStr:				.asciiz	 "Digite 1 para soma\nDigite 2 para subtracao\nDigite 3 para multiplicacao\nDigite 4 para divisao\nDigite 5 para potencia\nDigite 6 para raiz quadrada\nDigite 7 para Tabuada\nDigite 8 para IMC\nDigite 9 para fatorial\nDigite 10 para fibonacci\nDigite 11 para encerrar\n"
+	space:		.space 3
+	menuInicial:	.asciiz "\nDigite C para calculo ou M para memoria.\n"
+	menuMemoria:	.asciiz "\nDigite M3 para o antepenultimo resultado, M2 para o penultimo, M1 para o ultimo, ou M0 para voltar ao menu anterior\n"	
+	opcoesStr:				.asciiz	 "Digite 1 para soma\nDigite 2 para subtracao\nDigite 3 para multiplicacao\nDigite 4 para divisao\nDigite 5 para potencia\nDigite 6 para raiz quadrada\nDigite 7 para Tabuada\nDigite 8 para fatorial\nDigite 9 para fibonacci\nDigite 10 para voltar ao menu inicial\n"
 	entradaInvalidaStr:		.asciiz	 "Entrada invalida\n"
 	somaStr:				.asciiz	 "Digite dois numeros positivos que deseja somar\n"
 	somaResultadoStr:		.asciiz  "Resultado da soma: "
@@ -20,8 +18,6 @@
 	tabuadaStr:				.asciiz  "Digite um numero positivo\n"
 	tabuadaPrintResultado:	.asciiz	 "Tabudada do "
 	tabuadaFormatResultado:	.asciiz	 ": "
-	imcStr:					.asciiz  "Digite o peso em Kg e a altura em metros\n"
-	imcResultado: 			.asciiz  "Resultado do IMC: "
 	fatorialStr:			.asciiz  "Digite um numero inteiro positivo que deseja calcular o fatorial\n"
 	fatorialResultado: 		.asciiz  "Resultado do fatorial: "
 	fibonacciStr:			.asciiz  "Digite o inicio e o final do intervalo\n"
@@ -33,9 +29,75 @@
 	zeroAsFloat:			.float 	 0.0 				#serve para auxiliar operacoes com floats
 	divisorPorDois:			.float 	 2.0 				#Auxiliador do sqrt
 	umAsFloat:				.float	 1.0				#serve para auxiliar operacoes com flotas
+	ultimostr:			.asciiz "\nUltimo\n"
+	penultimostr:			.asciiz "\npenultimo\n"
+	antepenultimostr:		.asciiz "\nantepenultimo\n"
 	.text
 	.globl main
 main:
+
+	menuIni:
+	li	$v0,	4				#Printar a primeira parte do menu.
+	la	$a0,	menuInicial
+	syscall
+		
+	li	$v0,	12				#Ler o carcter entrado.
+	syscall
+	
+	move $t1, $v0
+	
+	beq $t1, 'C', mainLoop
+	beq $t1, 'M', loopMenuMem
+	j exit	
+
+loopMenuMem:
+
+	li	$v0,	4				#Printar a primeira parte do menu.
+	la	$a0,	menuMemoria
+	syscall
+	
+	li $v0, 8 # v0 = 8 => read string
+	la $a0, space # a0 = pos mem -> posicao de armazenadas na mem
+	li $a1, 3 # a1 = qtd de bytes/caracteres a serem lidos
+	syscall #resultado da leitura salva em $a0
+	
+	move $t1, $a0
+	
+	lb $t2 ($t1)
+	bne $t2, 'M', menuIni
+	
+	addi $t1, $t1, 1
+	lb $t2 ($t1)
+	
+	beq $t2, '1', ultimo
+	beq $t2, '2', penultimo
+	beq $t2, '3', antepenultimo
+	beq $t2, '0', menuIni
+	
+	j exit
+	
+ultimo:
+	li	$v0,	4				#Printar a primeira parte do menu.
+	la	$a0,	ultimostr
+	syscall	
+	
+	j loopMenuMem
+	
+penultimo:
+	li	$v0,	4				#Printar a primeira parte do menu.
+	la	$a0,	penultimostr
+	syscall
+	
+	j loopMenuMem
+	
+antepenultimo:	
+	li	$v0,	4				#Printar a primeira parte do menu.
+	la	$a0,	antepenultimostr
+	syscall
+	
+	j loopMenuMem
+
+
 	mainLoop:
 														#printa a string com opcoes do programa
 		li $v0, 4 										#servico para printar string
@@ -53,13 +115,12 @@ main:
 		beq $v0, 5, potencia
 		beq $v0, 6, raiz
 		beq $v0, 7, tabuada
-		beq $v0, 8, imc
-		beq $v0, 9, fatorial
-		beq $v0, 10, fibonacci
-		beq $v0, 11, exitMainLoop
+		beq $v0, 8, fatorial
+		beq $v0, 9, fibonacci
+		beq $v0, 10, menuIni
 		blt $v0,0, entradaInvalida
-		bgt $v0, 11, entradaInvalida
-	exitMainLoop:
+		bgt $v0, 10, entradaInvalida
+	exit:
 	li $v0, 10
 	syscall
 
@@ -382,50 +443,7 @@ tabuada:
 	la $a0, quebraDeLinha 								#carrega endereco da string
 	syscall
 	
- 	j mainLoop
- 
-#8
-imc:
-	#printa a string imcStr
- 	li $v0, 4 											#servico de printar string
- 	la $a0, imcStr 										#carrega o endereco da string
- 	syscall
- 	
- 	#le um float e o armazena em $f2
-	#ou seja, f2 contem o peso
-	li $v0, 6 											#servico de ler um float
-	syscall
-	c.lt.s $f0, $f1 									#checa se $f0 < 0, caso sim seta bclt como verdadeiro
-	bc1t entradaInvalida 								#caso verdadeiro ira para o label entradaInvalida
-	add.s $f2, $f1, $f0 								#$f2 = $f1 + $f0, essencialmente armazena em $f2 o valor lido
-	
-	#le um float e o armazena em $f3
-	#ou seja f3 contem a altura
-	li $v0, 6 											#servico de ler um float
-	syscall
-	c.le.s $f0, $f1 									#checa se $f0 < 0, caso sim seta bclt como verdadeiro
-	bc1t entradaInvalida 								#caso verdadeiro ira para o label entradaInvalida
-	add.s $f3, $f1, $f0 								#$f3 = $f1 + $f0, essencialmente armazena em $f3 o valor lido
-	
-	mul.s $f3, $f3, $f3 								#$f3 = $f3*$f3 (altura ao quadrado)
-	div.s $f12, $f2, $f3 								#f12 = $f4 / $f3
-	
-	#printa a string imcResultado
-	li $v0, 4 											#servico de printar string
-	la $a0, imcResultado
-	syscall
-	
-	#printa o resultado do imc
-	li $v0, 2 											#servico de printar float
-	syscall
-	
-	#printa a string quebraDeLinha
-	li $v0, 4 											#servico de printar string
-	la $a0, quebraDeLinha 								#carrega endereco da string
-	syscall
-	
-	j mainLoop
- 		
+ 	j mainLoop	
  	
 #9
 fatorial:
@@ -564,9 +582,6 @@ fibonacci:
  	addi $sp, $sp, 12
  	addi $v0, $v0, 1 									#soma 1 ao resultado
  	jr $ra	
- 	
-
-	
 	
 entradaInvalida:
 	#printa a string entradaInvalidaStr
@@ -574,5 +589,3 @@ entradaInvalida:
 	la $a0, entradaInvalidaStr 							#armazena endereco da string
 	syscall
 	j mainLoop
-
-
