@@ -719,6 +719,7 @@ fibonacci:
  	syscall
  	move $a1, $v0 									#armazena $v0 em $a1
  	ble $a1, $a2, entradaInvalida 							#checa se a entrada eh maior que 0, caso nao vai para o label entradaInvalida
+ 	add $a3, $a1, $zero
  	
 	#printa a string fibonnaciResultado
  	li $v0, 4 									#servico de printar string
@@ -736,8 +737,14 @@ fibonacci:
         li $v0, 1 									#servico de printar inteiro
         syscall
         
+	bne $a1, $a3, notSaveJump 							#verifica se e a primeira iteracao
+        #guarda na memoria
         add $t7, $a0, $zero								#guarda resultado em t7
-        
+	mtc1 $t7, $f0									#transfere dados de t7 para f0
+	cvt.s.w $f0, $f0								#converte o inteiro em f0 para float e carrega em f0
+	jal adicionaVetorMem								#chama funcao de adicionar na memoria
+ 	
+ 	notSaveJump:
 	#printa a string espaco
  	li $v0, 4 									#servico de printar string
  	la $a0, espaco 									#armazena endereco da string
@@ -752,11 +759,7 @@ fibonacci:
 	la $a0, quebraDeLinha 								#carrega endereco da string
 	syscall
 	
-	#guarda na memoria
-	mtc1 $t7, $f0									#transfere dados de t7 para f0
-	cvt.s.w $f0, $f0								#converte o inteiro em f0 para float e carrega em f0
-	jal adicionaVetorMem								#chama funcao de adicionar na memoria
- 	
+	
  	j mainLoop
  	
  	CalculaFibonacci:
