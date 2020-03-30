@@ -81,7 +81,7 @@ main:
 		beq $t2, '3', antepenultimo
 		beq $t2, '0', menuIni
 	
-		j exit
+		j menuIni
 
 	mainLoop:
 		#printa a string com opcoes do programa
@@ -116,7 +116,7 @@ ultimo:
 	la $a0,	ultimostr
 	syscall	
 	
-	#coloca em t0 o endereÁo do vetorMem
+	#coloca em t0 o endere√ßo do vetorMem
 	la $t0, vetorMem
 	
 	#pega o primeiro item que indica onde vai ser colocado o novo, obs: nao tem problema colocar em int pq o primeiro valor nao e um float)
@@ -158,7 +158,7 @@ penultimo:
 	la	$a0,	penultimostr
 	syscall
 	
-	#coloca em t0 o endereÁo do vetorMem
+	#coloca em t0 o endere√ßo do vetorMem
 	la $t0, vetorMem
 	
 	#pega o primeiro item que indica onde vai ser colocado o novo, obs: nao tem problema colocar em int pq o primeiro valor nao e um float)
@@ -200,7 +200,7 @@ antepenultimo:
 	la	$a0,	antepenultimostr						
 	syscall
 	
-	#coloca em t0 o endereÁo do vetorMem
+	#coloca em t0 o endere√ßo do vetorMem
 	la $t0, vetorMem
 	
 	#pega o primeiro item que indica onde vai ser colocado o novo, obs: nao tem problema colocar em int pq o primeiro valor nao e um float)
@@ -232,7 +232,7 @@ antepenultimo:
 
 #pega o valor do $f0 e guarda ele na posicao mais antiga do vetorMem
 adicionaVetorMem:
-	#coloca em t0 o endereÁo do vetorMem
+	#coloca em t0 o endere√ßo do vetorMem
 	la $t0, vetorMem
 	
 	#coloca em $t1 o valor do primeiro float do vetorMem
@@ -337,7 +337,7 @@ soma:
 	mov.s $f0, $f12									#move resultado para f0
 	jal adicionaVetorMem								#chama funcao de adicionar na memoria
 	
-	j mainLoop
+	j menuIni
 
 #2	
 subtracao:
@@ -380,7 +380,7 @@ subtracao:
 	mov.s $f0, $f12									#move resultado para f0
 	jal adicionaVetorMem								#chama funcao de adicionar na memoria
 	
-	j mainLoop	
+	j menuIni	
 	
 #3
 multiplicacao:
@@ -423,7 +423,7 @@ multiplicacao:
 	mov.s $f0, $f12									#move resultado para f0
 	jal adicionaVetorMem								#chama funcao de adicionar na memoria
 	
-	j mainLoop	
+	j menuIni	
 	
 #4
 divisao:
@@ -467,7 +467,7 @@ divisao:
 	mov.s $f0, $f12									#move resultado para f0
 	jal adicionaVetorMem								#chama funcao de adicionar na memoria
 	
-	j mainLoop	
+	j menuIni	
 
 #5
 potencia:
@@ -521,7 +521,7 @@ potencia:
 	syscall
 	
 	
-	j mainLoop
+	j menuIni
 	
 #6
 raiz:
@@ -574,7 +574,7 @@ loopRaiz:
 	jal adicionaVetorMem								#chama funcao de adicionar na memoria
 		
 
-	j mainLoop
+	j menuIni
 
  
 #7
@@ -642,9 +642,9 @@ tabuada:
 	la $a0, quebraDeLinha 								#carrega endereco da string
 	syscall
 	
- 	j mainLoop	
+ 	j menuIni	
  	
-#9
+#8
 fatorial:
 	#printa a string fatorialStr
  	li $v0, 4 									#servico de printar string
@@ -680,7 +680,7 @@ fatorial:
 	la $a0, quebraDeLinha 								#carrega endereco da string
 	syscall
 	         
-        j mainLoop
+        j menuIni
 
 	Calculafatorial:								#funcao recursiva para calcular o fatorial
 		addi $sp, $sp, -8 							#reserva espaco
@@ -702,7 +702,7 @@ fatorial:
 		addi $sp, $sp, 8
 		jr $ra 
 		
-#10
+#9
 fibonacci:
 	#printa a string fibonnaciStr
  	li $v0, 4 									#servico de printar string
@@ -761,7 +761,7 @@ fibonacci:
 	syscall
 	
 	
- 	j mainLoop
+ 	j menuIni
  	
  	CalculaFibonacci:
  	addi $sp, $sp, -12 								#reserva espaco na pilha
@@ -801,7 +801,7 @@ entradazerodivisao:
 	li $v0, 4 									#servico de printar string
 	la $a0, entradaInvalidaZero 							#armazena endereco da string
 	syscall
-	j divisao								#volta para a funÁ„o da divis„o
+	j divisao								#volta para a fun√ß√£o da divis√£o
 	
 entradaInvalida:
 	#printa a string entradaInvalidaStr
